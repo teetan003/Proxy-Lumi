@@ -1,6 +1,7 @@
 FROM alpine:edge
 
-RUN apk add --no-cache procps 3proxy
+RUN apk add --no-cache procps \
+    && apk add --no-cache 3proxy --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 
 WORKDIR /etc/3proxy
 
