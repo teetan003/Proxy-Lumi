@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuthStore } from '../store/authStore';
-import { LogOut, Plus, RefreshCw, Trash2, Shield, Globe, Clock, Wallet } from 'lucide-react';
+import { LogOut, Plus, RefreshCw, Trash2, Shield, Globe, Clock, Wallet, Settings } from 'lucide-react';
 import DepositModal from '../components/DepositModal';
 
 export default function Dashboard() {
   const { user, logout } = useAuthStore();
   const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const navigate = useNavigate();
   
   const { data: proxies, isLoading, refetch } = useQuery({
     queryKey: ['proxies'],
@@ -39,11 +41,17 @@ export default function Dashboard() {
             <p className="text-sm text-slate-400">Welcome,</p>
             <p className="text-sm font-semibold text-white">{user?.email}</p>
           </div>
-          <button onClick={logout} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors">
+          {user?.role === 'admin' && (
+            <button onClick={() => navigate('/admin')} className="p-2 hover:bg-slate-800 rounded-full text-purple-400 hover:text-purple-300 transition-colors" title="Admin Panel">
+              <Settings size={20} />
+            </button>
+          )}
+          <button onClick={logout} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors" title="Logout">
             <LogOut size={20} />
           </button>
         </div>
       </nav>
+
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="flex justify-between items-end mb-8">
