@@ -5,6 +5,18 @@
 
 echo "🚀 Starting Proxy Platform setup..."
 
+# Detect Docker Compose command
+if docker compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+elif docker-compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker-compose"
+else
+    echo "❌ Error: Docker Compose not found. Please install Docker Compose."
+    exit 1
+fi
+
+echo "✅ Using: $DOCKER_COMPOSE"
+
 # 1. Create Backend .env if not exists
 if [ ! -f backend/.env ]; then
     echo "📝 Creating backend/.env..."
@@ -22,15 +34,15 @@ fi
 
 # 2. Build and start containers
 echo "📦 Building and starting Docker containers..."
-docker-compose up --build -d
+$DOCKER_COMPOSE up --build -d
 
 # 3. Wait for database to be ready
 echo "⏳ Waiting for database to be ready..."
-sleep 10
+sleep 15
 
 # 4. Run Prisma migrations
 echo "⚙️ Running database migrations..."
-docker-compose exec backend npx prisma migrate deploy
+$DOCKER_COMPOSE exec backend npx prisma migrate deploy
 
 echo "------------------------------------------------"
 echo "✅ Setup Complete!"
