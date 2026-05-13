@@ -12,11 +12,16 @@ export const register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Count users to see if this is the first one
+        const userCount = await prisma.user.count();
+        const role = userCount === 0 ? 'admin' : 'user';
+
         const user = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
-                role: 'user'
+                role: role
             }
         });
 
