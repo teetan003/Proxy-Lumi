@@ -68,9 +68,16 @@ $DOCKER_COMPOSE up --build -d
 echo "⏳ Waiting for database to be ready..."
 sleep 15
 
-# 4. Run Prisma migrations
-echo "⚙️ Running database migrations..."
-$DOCKER_COMPOSE exec -T backend npx prisma migrate deploy
+# 4. Initialize Database Schema
+echo "⚙️ Initializing database schema..."
+$DOCKER_COMPOSE exec -T backend npx prisma db push --accept-data-loss
+
+# 5. Create dummy IPs file if not exists
+if [ ! -f proxy-node/ips.txt ]; then
+    echo "📝 Creating dummy proxy-node/ips.txt..."
+    echo "192.168.1.100" > proxy-node/ips.txt
+    echo "✅ proxy-node/ips.txt created. Please edit this file with your real IPs."
+fi
 
 echo "------------------------------------------------"
 echo "✅ Setup Complete!"
