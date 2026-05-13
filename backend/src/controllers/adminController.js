@@ -1,4 +1,6 @@
 import prisma from '../utils/prisma.js';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import axios from 'axios';
 
 export const getAllUsers = async (req, res) => {
     try {
@@ -95,8 +97,6 @@ export const addProxiesBulk = async (req, res) => {
     }
 };
 
-import { HttpProxyAgent } from 'http-proxy-agent';
-import axios from 'axios';
 
 export const checkProxyHealth = async (req, res) => {
     try {
