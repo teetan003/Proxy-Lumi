@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { useAuthStore } from '../store/authStore';
 
 export default function Login() {
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -12,12 +13,14 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const res = await api.post(endpoint, { email, password });
       setAuth(res.data.user, res.data.token);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || (isLogin ? 'Login failed' : 'Registration failed'));
     }
   };
 
@@ -26,7 +29,7 @@ export default function Login() {
       <div className="glass p-8 rounded-2xl w-full max-w-md shadow-2xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold gradient-text">Proxy Platform</h1>
-          <p className="text-slate-400 mt-2">Sign in to your account</p>
+          <p className="text-slate-400 mt-2">{isLogin ? 'Sign in to your account' : 'Create a new account'}</p>
         </div>
         
         {error && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-4 text-sm">{error}</div>}
@@ -55,12 +58,19 @@ export default function Login() {
             />
           </div>
           <button type="submit" className="w-full btn-primary py-3">
-            Sign In
+            {isLogin ? 'Sign In' : 'Register'}
           </button>
         </form>
         
         <div className="mt-6 text-center text-slate-400 text-sm">
-          Don't have an account? <a href="#" className="text-sky-400 hover:underline">Register</a>
+          {isLogin ? "Don't have an account? " : "Already have an account? "}
+          <button 
+            type="button"
+            onClick={() => { setIsLogin(!isLogin); setError(''); }} 
+            className="text-sky-400 hover:underline"
+          >
+            {isLogin ? 'Register' : 'Sign In'}
+          </button>
         </div>
       </div>
     </div>
