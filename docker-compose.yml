@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: proxy-postgres
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: proxy_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: proxy-redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: proxy-backend
+    environment:
+      DATABASE_URL: "postgresql://postgres:secret@postgres:5432/proxy_platform?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: "your_jwt_secret_here"
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - /etc/3proxy:/etc/3proxy # For 3proxy config generation
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: proxy-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  proxy-node:
+    build: ./proxy-node
+    container_name: proxy-3proxy
+    privileged: true
+    network_mode: host # Needed for 3proxy to handle IP binding easily
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
