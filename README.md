@@ -33,27 +33,32 @@ A professional, high-performance proxy selling platform built with **Node.js, Re
 ## 📦 Installation & Setup
 
 ### Prerequisites
-- Docker & Docker Compose
-- Node.js 22+ (for local development)
+- A Linux server (Ubuntu/Debian recommended for automated setup).
+- Root or `sudo` access.
 
-### Deployment with Docker
+### 🚀 Automated Deployment (Recommended)
+The project includes a smart setup script that handles everything automatically, including installing Docker if it's missing!
+
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/teetan003/Proxy-Lumi.git
    cd Proxy-Lumi
    ```
 
-2. **Configure Environment**:
-   - Update `backend/.env` with your JWT secret and database URL if needed.
-
-3. **Start the containers**:
+2. **Run the Automated Setup**:
    ```bash
-   docker-compose up --build -d
+   chmod +x setup.sh
+   ./setup.sh
    ```
+   *The script will automatically:*
+   - *Install Docker & Docker Compose (if needed).*
+   - *Generate secure environment variables (`.env`).*
+   - *Build and start all microservices via Docker.*
+   - *Initialize the PostgreSQL database schema.*
 
-4. **Access the platform**:
-   - Web UI: `http://localhost:80`
-   - API: `http://localhost:3000`
+3. **Access the platform**:
+   - Web UI: `http://localhost` (or your server's IP)
+   - API: `http://localhost/api`
 
 ### Provisioning IPs
 To bind IPv4 addresses to your Linux host, use the provided script:
