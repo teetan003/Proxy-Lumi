@@ -1,6 +1,6 @@
 {
   "name": "proxy-platform-backend",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "src/index.js",
   "type": "module",
   "scripts": {

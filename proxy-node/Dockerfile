@@ -1,9 +1,7 @@
-FROM debian:bookworm-slim
+FROM alpine:latest
 
-RUN apt-get update && apt-get install -y \
-    3proxy \
-    procps \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache procps \
+    && apk add --no-cache 3proxy --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 
 WORKDIR /etc/3proxy
 
@@ -11,6 +9,6 @@ WORKDIR /etc/3proxy
 RUN mkdir -p /var/log/3proxy
 
 # Initial empty config
-RUN echo "daemon\nauth strong\nproxy -p3128" > 3proxy.cfg
+RUN printf "daemon\nauth strong\nproxy -p3128\n" > 3proxy.cfg
 
 CMD ["3proxy", "/etc/3proxy/3proxy.cfg"]
