@@ -42,6 +42,8 @@ model Proxy {
   password   String
   type       String      @default("http")
   status     ProxyStatus @default(active)
+  country    String?     @default("Unknown")
+  latency    Int?
   expiresAt  DateTime?   @map("expires_at")
   assignedTo String?     @db.Uuid @map("assigned_to")
   user       User?       @relation(fields: [assignedTo], references: [id])
