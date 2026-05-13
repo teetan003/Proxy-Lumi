@@ -5,14 +5,42 @@
 
 echo "🚀 Starting Proxy Platform setup..."
 
+# Detect OS and Install Docker if missing
+if ! command -v docker >/dev/null 2>&1; then
+    echo "⚠️ Docker not found. Attempting to install Docker..."
+    if command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update
+        sudo apt-get install -y ca-certificates curl gnupg
+        sudo install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        sudo systemctl enable --now docker
+        echo "✅ Docker installed successfully."
+    else
+        echo "❌ Error: Unsupported OS for auto-installation. Please install Docker manually."
+        exit 1
+    fi
+fi
+
 # Detect Docker Compose command
 if docker compose version >/dev/null 2>&1; then
     DOCKER_COMPOSE="docker compose"
 elif docker-compose version >/dev/null 2>&1; then
     DOCKER_COMPOSE="docker-compose"
 else
-    echo "❌ Error: Docker Compose not found. Please install Docker Compose."
-    exit 1
+    echo "⚠️ Docker Compose not found. Attempting to install Docker Compose..."
+    if command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update
+        sudo apt-get install -y docker-compose-plugin
+        DOCKER_COMPOSE="docker compose"
+        echo "✅ Docker Compose plugin installed."
+    else
+        echo "❌ Error: Could not install Docker Compose. Please install it manually."
+        exit 1
+    fi
 fi
 
 echo "✅ Using: $DOCKER_COMPOSE"
@@ -42,7 +70,7 @@ sleep 15
 
 # 4. Run Prisma migrations
 echo "⚙️ Running database migrations..."
-$DOCKER_COMPOSE exec backend npx prisma migrate deploy
+$DOCKER_COMPOSE exec -T backend npx prisma migrate deploy
 
 echo "------------------------------------------------"
 echo "✅ Setup Complete!"
